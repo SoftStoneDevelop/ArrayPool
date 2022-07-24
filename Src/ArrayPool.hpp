@@ -1,6 +1,8 @@
 #pragma once
 #include <map>
 #include <unordered_map>
+#include <thread>
+#include <future>
 
 namespace ArrayPool
 {
@@ -8,7 +10,10 @@ namespace ArrayPool
 	class ArrayPool
 	{
 	public:
-		ArrayPool() = default;
+		ArrayPool() : _requestDestruct{false}
+		{
+			_timer = std::thread (&ArrayPool::TimerRoutine, this);
+		}
 		ArrayPool(const ArrayPool& other) = delete;
 		ArrayPool(const ArrayPool&& other) = delete;
 
@@ -17,6 +22,10 @@ namespace ArrayPool
 
 		~ArrayPool()
 		{
+			_requestDestruct = true;
+			_cv.notify_all();
+			_timer.join();
+
 			for (auto i = _freeArrays.begin(); i != _freeArrays.end(); i++)
 			{
 				delete[](*i).second._ptr;
@@ -30,6 +39,8 @@ namespace ArrayPool
 
 		int* Rent(const int& size, int& realSize)
 		{
+			std::lock_guard lg(_m);
+
 			auto upiter = _freeArrays.upper_bound(size - 1);
 			T* result;
 
@@ -62,6 +73,8 @@ namespace ArrayPool
 			}
 
 			auto& bucket = *finded;
+
+			std::lock_guard lg(_m);
 			_freeArrays.insert(std::pair<int, Bucket>(bucket.second._size, bucket.second));
 			_rentedArrays.erase(finded);
 
@@ -75,7 +88,35 @@ namespace ArrayPool
 			int _size;
 		};
 
+		void TimerRoutine()
+		{
+			using namespace std::literals::chrono_literals;
+
+			while (WaitFor(60s))
+			{
+				std::lock_guard lg(_m);
+				for (auto i = _freeArrays.begin(); i != _freeArrays.end(); i++)
+				{
+					delete[](*i).second._ptr;
+				}
+
+				_freeArrays.clear();
+			}
+		}
+
+		template<typename R, typename P>
+		bool WaitFor(std::chrono::duration<R, P> const& time) 
+		{
+			std::unique_lock<std::mutex> lock(_m);
+			return !_cv.wait_for(lock, time, [&] {return _requestDestruct; });
+		}
+
 		std::map<int, Bucket> _freeArrays;
 		std::unordered_map<T*, Bucket> _rentedArrays;
+		
+		std::thread _timer;
+		volatile bool _requestDestruct;
+		std::mutex _m;
+		std::condition_variable _cv;
 	};
 }
