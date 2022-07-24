@@ -1,10 +1,6 @@
 #pragma once
 #include <map>
-#include <set>
 #include <unordered_map>
-#include <unordered_set>
-#include <utility>
-#include <iostream>
 
 namespace ArrayPool
 {
@@ -66,7 +62,6 @@ namespace ArrayPool
 			}
 
 			auto& bucket = *finded;
-			std::cout << "Return array '" << bucket.second._ptr << "' real size '" << bucket.second._size << "'" << std::endl;
 			_freeArrays.insert(std::pair<int, Bucket>(bucket.second._size, bucket.second));
 			_rentedArrays.erase(finded);
 
