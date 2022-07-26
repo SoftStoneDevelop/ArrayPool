@@ -15,7 +15,7 @@ namespace ArrayPool
 			_timer = std::thread (&ArrayPool::TimerRoutine, this);
 		}
 		ArrayPool(const ArrayPool& other) = delete;
-		ArrayPool(const ArrayPool&& other) = delete;
+		ArrayPool(ArrayPool&& other) = delete;
 
 		ArrayPool& operator=(ArrayPool&& other) = delete;
 		ArrayPool& operator=(const ArrayPool& other) = delete;
