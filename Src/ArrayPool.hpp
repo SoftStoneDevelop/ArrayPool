@@ -37,7 +37,7 @@ namespace ArrayPool
 			}
 		}
 
-		int* Rent(const int& size, int& realSize)
+		T* Rent(const int& size, int& realSize)
 		{
 			std::lock_guard lg(_m);
 
