@@ -12,7 +12,7 @@ namespace ArrayPool
 	public:
 		ArrayPool() : _requestDestruct{false}
 		{
-			_timer = std::thread (&ArrayPool::TimerRoutine, this);
+			_timer = std::thread (&ArrayPool::timerRoutine, this);
 		}
 		ArrayPool(const ArrayPool& other) = delete;
 		ArrayPool(ArrayPool&& other) = delete;
@@ -88,11 +88,11 @@ namespace ArrayPool
 			int _size;
 		};
 
-		void TimerRoutine()
+		void timerRoutine()
 		{
 			using namespace std::literals::chrono_literals;
 
-			while (WaitFor(60s))
+			while (waitFor(60s))
 			{
 				std::lock_guard lg(_m);
 				for (auto i = _freeArrays.begin(); i != _freeArrays.end(); i++)
@@ -105,7 +105,7 @@ namespace ArrayPool
 		}
 
 		template<typename R, typename P>
-		bool WaitFor(std::chrono::duration<R, P> const& time) 
+		bool waitFor(std::chrono::duration<R, P> const& time) 
 		{
 			std::unique_lock<std::mutex> lock(_m);
 			return !_cv.wait_for(lock, time, [&] {return _requestDestruct; });
