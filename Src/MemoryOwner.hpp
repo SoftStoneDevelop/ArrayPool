@@ -38,6 +38,8 @@ namespace ArrayPool
 			data_ = other.data_;
 
 			other.data_ = nullptr;
+			
+			return *this;
 		}
 		MemoryOwner& operator=(const MemoryOwner& other) = delete;
 
