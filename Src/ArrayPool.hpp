@@ -12,13 +12,13 @@ namespace ArrayPool
 	public:
 		ArrayPool() : _requestDestruct{false}
 		{
-			_timer = std::thread (&ArrayPool::timerRoutine, this);
+			_timer = std::thread (&ArrayPool<T>::timerRoutine, this);
 		}
-		ArrayPool(const ArrayPool& other) = delete;
-		ArrayPool(ArrayPool&& other) = delete;
+		ArrayPool(const ArrayPool<T>& other) = delete;
+		ArrayPool(ArrayPool<T>&& other) = delete;
 
-		ArrayPool& operator=(ArrayPool&& other) = delete;
-		ArrayPool& operator=(const ArrayPool& other) = delete;
+		ArrayPool<T>& operator=(ArrayPool<T>&& other) = delete;
+		ArrayPool<T>& operator=(const ArrayPool<T>& other) = delete;
 
 		~ArrayPool()
 		{

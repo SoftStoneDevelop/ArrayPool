@@ -14,7 +14,7 @@ namespace ArrayPool
 		{
 		}
 		
-		MemoryOwner(std::shared_ptr<ArrayPool::ArrayPool<T>> pool, int size)
+		MemoryOwner(std::shared_ptr<ArrayPool<T>> pool, int size)
 			: pool_{ std::move(pool) }, data_{nullptr}
 		{
 			data_ = pool_->Rent(size, size_);
@@ -28,14 +28,15 @@ namespace ArrayPool
 			}
 		}
 
-		MemoryOwner(const MemoryOwner& other) = delete;
-		MemoryOwner(MemoryOwner&& other) 
+		MemoryOwner(const MemoryOwner<T>& other) = delete;
+
+		MemoryOwner(MemoryOwner<T>&& other) 
 			: pool_{ std::move(other.pool_) }, size_{ other.size_ }, data_{ other.data_ }
 		{
 			other.data_ = nullptr;
 		}
 
-		MemoryOwner& operator=(MemoryOwner&& other)
+		MemoryOwner<T>& operator=(MemoryOwner<T>&& other)
 		{
 			pool_ = std::move(other.pool_);
 			size_ = other.size_;
@@ -45,7 +46,8 @@ namespace ArrayPool
 			
 			return *this;
 		}
-		MemoryOwner& operator=(const MemoryOwner& other) = delete;
+
+		MemoryOwner<T>& operator=(const MemoryOwner<T>& other) = delete;
 
 		const int size() const noexcept
 		{
@@ -57,7 +59,7 @@ namespace ArrayPool
 			return data_;
 		}
 	private:
-		std::shared_ptr<ArrayPool::ArrayPool<T>> pool_;
+		std::shared_ptr<ArrayPool<T>> pool_;
 		int size_;
 		T* data_;
 	};

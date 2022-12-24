@@ -7,22 +7,22 @@ namespace ArrayPool
 	class MemoryOwnerFactory
 	{
 	public:
-		MemoryOwnerFactory(std::shared_ptr<ArrayPool::ArrayPool<T>> pool) noexcept : pool_{std::move(pool)}
+		MemoryOwnerFactory(std::shared_ptr<ArrayPool<T>> pool) noexcept : pool_{std::move(pool)}
 		{
 
 		}
 
-		MemoryOwner<T> rentMemory(const int size)
+		MemoryOwner<T> rentMemory(const int size) const
 		{
-			return MemoryOwner<char>(pool_, size);
+			return MemoryOwner<T>(pool_, size);
 		}
 
-		MemoryOwner<T>* newRentMemory(const int size)
+		MemoryOwner<T>* newRentMemory(const int size) const
 		{
-			return new MemoryOwner<char>(pool_, size);
+			return new MemoryOwner<T>(pool_, size);
 		}
 
 	private:
-		std::shared_ptr<ArrayPool::ArrayPool<T>> pool_;
+		std::shared_ptr<ArrayPool<T>> pool_;
 	};
 }
