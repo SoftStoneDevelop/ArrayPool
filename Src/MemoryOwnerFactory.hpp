@@ -17,6 +17,11 @@ namespace ArrayPool
 			return MemoryOwner<char>(pool_, size);
 		}
 
+		MemoryOwner<T>* newRentMemory(const int size)
+		{
+			return new MemoryOwner<char>(pool_, size);
+		}
+
 	private:
 		std::shared_ptr<ArrayPool::ArrayPool<T>> pool_;
 	};
