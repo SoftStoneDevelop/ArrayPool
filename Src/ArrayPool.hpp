@@ -10,7 +10,7 @@ namespace ArrayPool
 	class ArrayPool
 	{
 	public:
-		ArrayPool() : _requestDestruct{false}
+		ArrayPool()
 		{
 			_timer = std::thread (&ArrayPool<T>::timerRoutine, this);
 		}
@@ -108,14 +108,14 @@ namespace ArrayPool
 		bool waitFor(std::chrono::duration<R, P> const& time) 
 		{
 			std::unique_lock<std::mutex> lock(_m);
-			return !_cv.wait_for(lock, time, [&] {return _requestDestruct; });
+			return !_cv.wait_for(lock, time, [&] {return _requestDestruct.load(); });
 		}
 
 		std::map<int, Bucket> _freeArrays;
 		std::unordered_map<T*, Bucket> _rentedArrays;
 		
 		std::thread _timer;
-		volatile bool _requestDestruct;
+		std::atomic<bool> _requestDestruct = false;
 		std::mutex _m;
 		std::condition_variable _cv;
 	};
